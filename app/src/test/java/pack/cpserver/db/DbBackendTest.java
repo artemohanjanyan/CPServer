@@ -22,7 +22,8 @@ import pack.cpserver.BuildConfig;
 import solid.collectors.ToSolidList;
 import solid.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
@@ -48,12 +49,12 @@ public class DbBackendTest {
     @Test
     public void insertAndGetSingleArtist() throws Exception {
         Artist artist = artistTestBuilder(0).build();
-        assertTrue(backend.insertArtist(database, artist) != -1);
+        assertTrue(backend.insertArtist(database, artist));
         Stream.stream(artist.genres()).forEach(genre ->
-                assertTrue(backend.insertGenre(database, genre) != -1));
-        backend.insertArtistGenres(database, artist, backend.getGenreIds(database));
+                assertTrue(backend.insertGenre(database, genre)));
+        assertTrue(backend.insertArtistGenres(database, artist, backend.getGenreIds(database)));
 
-        Cursor artistCursor = backend.getArtists();
+        Cursor artistCursor = backend.getArtists(null, null, null, null, null);
         assertEquals(artistCursor.getCount(), 1);
         assertTrue(artistCursor.moveToNext());
         Artist artist1 = Artist.create(artistCursor);
@@ -70,9 +71,9 @@ public class DbBackendTest {
             artists.add(builder.build());
         }
 
-        backend.insertArtists(Stream.stream(artists));
+        assertTrue(backend.insertArtists(Stream.stream(artists)));
 
-        Cursor artistsCursor = backend.getArtists();
+        Cursor artistsCursor = backend.getArtists(null, null, null, null, null);
         List<Artist> artists1 = new ArrayList<>(artistsCursor.getCount());
         while (artistsCursor.moveToNext()) {
             artists1.add(Artist.create(artistsCursor));

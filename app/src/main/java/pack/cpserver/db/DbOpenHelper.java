@@ -5,7 +5,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import static pack.cpserver.db.DbContract.*;
+import static pack.cpserver.db.DbContract.ARTISTS;
+import static pack.cpserver.db.DbContract.ARTISTS_GENRES;
+import static pack.cpserver.db.DbContract.Artists;
+import static pack.cpserver.db.DbContract.ArtistsGenres;
+import static pack.cpserver.db.DbContract.DB_NAME;
+import static pack.cpserver.db.DbContract.GENRES;
+import static pack.cpserver.db.DbContract.Genres;
 
 public class DbOpenHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 3;
@@ -19,7 +25,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
         Log.d(this.getClass().getSimpleName(), "db created");
 
         db.execSQL("CREATE TABLE " + ARTISTS + " (" +
-                Artists.ID + " INTEGER PRIMARY KEY," +
+                Artists._ID + " INTEGER PRIMARY KEY," +
                 Artists.NAME + " TEXT," +
                 Artists.TRACKS + " INTEGER," +
                 Artists.ALBUMS + " INTEGER," +
@@ -29,18 +35,12 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                 Artists.BIG_COVER + " TEXT)");
 
         db.execSQL("CREATE TABLE " + GENRES + " (" +
-                Genres.ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                Genres._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 Genres.NAME + " TEXT UNIQUE)");
 
         db.execSQL("CREATE TABLE " + ARTISTS_GENRES + " (" +
                 ArtistsGenres.ARTISTS_ID + " INTEGER," +
                 ArtistsGenres.GENRES_ID + " INTEGER)");
-
-//        db.execSQL("CREATE TABLE " + ARTISTS_GENRES + " (" +
-//                ArtistsGenres.ARTISTS_ID + " INTEGER," +
-//                ArtistsGenres.GENRES_ID + " INTEGER, " +
-//                "PRIMARY KEY " +
-//                "(" + ArtistsGenres.ARTISTS_ID + ", " + ArtistsGenres.GENRES_ID + ")");
     }
 
     @Override

@@ -1,12 +1,17 @@
 package pack.cpserver.db;
 
-interface DbContract {
+import android.provider.BaseColumns;
+
+public interface DbContract {
     String DB_NAME = "artists.db";
 
-    String ARTISTS = "artists";
-    interface Artists {
+    String ARTISTS = "ARTISTS";
+    String GENRES = "GENRES";
+    String ARTISTS_GENRES = "ARTISTS_GENRES";
+    String GENRES_JOIN_DELIMITER = "$";
+
+    interface Artists extends BaseColumns {
         String
-                ID = "_ID",
                 NAME = "NAME",
                 TRACKS = "TRACKS",
                 ALBUMS = "ALBUMS",
@@ -16,19 +21,14 @@ interface DbContract {
                 BIG_COVER = "BIG_COVER";
     }
 
-    String GENRES = "genres";
-    interface Genres {
+    interface Genres extends BaseColumns {
         String
-                ID = "_ID",
                 NAME = "NAME";
     }
 
-    String ARTISTS_GENRES = "artists_genres";
     interface ArtistsGenres {
         String
                 ARTISTS_ID = "ARTISTS_ID",
                 GENRES_ID = "GENRES_ID";
     }
-
-    String GENRES_JOIN_DELIMITER = "$";
 }

@@ -8,6 +8,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <provider
             android:name=".cp.ContentProvider"
             android:authorities="pack.cpserver.cp.ContentProvider"
