@@ -48,6 +48,9 @@ dependencies {
     apt 'com.ryanharter.auto.value:auto-value-gson:0.4.2'
     provided 'com.ryanharter.auto.value:auto-value-gson:0.4.2'
 
+    apt 'com.ryanharter.auto.value:auto-value-parcel:0.2.3-rc2'
+    compile 'com.ryanharter.auto.value:auto-value-parcel-adapter:0.2.3-rc2'
+
     def solidVersion = '2.0.3'
     compile "info.android15.solid:streams:$solidVersion"
     compile "info.android15.solid:collections:$solidVersion"

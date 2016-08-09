@@ -1,31 +1,40 @@
 package pack.cpserver.db;
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
+import com.ryanharter.auto.value.parcel.ParcelAdapter;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static pack.cpserver.db.DbContract.GENRES_JOIN_DELIMITER;
+
 @AutoValue
-public abstract class Artist {
+public abstract class Artist implements Parcelable {
     public static Artist create(Cursor cursor) {
-        Artist.Builder builder = new AutoValue_Artist.Builder();
+        Artist.Builder builder = new $$AutoValue_Artist.Builder();
         builder.id(cursor.getInt(0));
         builder.name(cursor.getString(1));
-        builder.genres(new HashSet<>(Arrays.asList(cursor.getString(2)
-                .split(Pattern.quote(DbContract.GENRES_JOIN_DELIMITER)))));
+        String genres = cursor.getString(2);
+        if (genres == null) {
+            genres = "";
+        }
+        builder.genres(new HashSet<>(Arrays.asList(genres
+                .split(Pattern.quote(GENRES_JOIN_DELIMITER)))));
         builder.tracks(cursor.getInt(3));
         builder.albums(cursor.getInt(4));
-        builder.link(cursor.getString(5));
+        String string = cursor.getString(5);
+        builder.link(string);
         builder.description(cursor.getString(6));
 
-        Cover.Builder coverBuilder = new AutoValue_Artist_Cover.Builder();
+        Cover.Builder coverBuilder = new $$AutoValue_Artist_Cover.Builder();
         coverBuilder.small(cursor.getString(7));
         coverBuilder.big(cursor.getString(8));
         builder.cover(coverBuilder.build());
@@ -33,18 +42,19 @@ public abstract class Artist {
         return builder.build();
     }
 
-    public static TypeAdapter<Artist> typeAdapter(Gson gson) {
-        return new AutoValue_Artist.GsonTypeAdapter(gson);
+    public static com.google.gson.TypeAdapter<Artist> typeAdapter(Gson gson) {
+        return new $AutoValue_Artist.GsonTypeAdapter(gson);
     }
 
     public static Builder builder() {
-        return new AutoValue_Artist.Builder();
+        return new $$AutoValue_Artist.Builder();
     }
 
     public abstract int id();
 
     public abstract String name();
 
+    @ParcelAdapter(GenresTypeAdapter.class)
     public abstract Set<String> genres();
 
     public abstract int tracks();
@@ -80,13 +90,13 @@ public abstract class Artist {
     }
 
     @AutoValue
-    public static abstract class Cover {
-        public static TypeAdapter<Cover> typeAdapter(Gson gson) {
-            return new AutoValue_Artist_Cover.GsonTypeAdapter(gson);
+    public static abstract class Cover implements Parcelable {
+        public static com.google.gson.TypeAdapter<Cover> typeAdapter(Gson gson) {
+            return new $AutoValue_Artist_Cover.GsonTypeAdapter(gson);
         }
 
         public static Builder builder() {
-            return new AutoValue_Artist_Cover.Builder();
+            return new $$AutoValue_Artist_Cover.Builder();
         }
 
         public abstract String small();
@@ -100,6 +110,28 @@ public abstract class Artist {
             public abstract Builder big(String big);
 
             public abstract Cover build();
+        }
+    }
+
+    public static class GenresTypeAdapter
+            implements com.ryanharter.auto.value.parcel.TypeAdapter<Set<String>> {
+
+        @Override
+        public Set<String> fromParcel(Parcel in) {
+            int n = in.readInt();
+            Set<String> strings = new HashSet<>();
+            for (int i = 0; i < n; ++i) {
+                strings.add(in.readString());
+            }
+            return strings;
+        }
+
+        @Override
+        public void toParcel(Set<String> value, Parcel dest) {
+            dest.writeInt(value.size());
+            for (String string : value) {
+                dest.writeString(string);
+            }
         }
     }
 }
