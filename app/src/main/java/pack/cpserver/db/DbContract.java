@@ -2,23 +2,25 @@ package pack.cpserver.db;
 
 import android.provider.BaseColumns;
 
+import pack.cpserver.cp.ContentContract;
+
 public interface DbContract {
     String DB_NAME = "artists.db";
 
-    String ARTISTS = "ARTISTS";
-    String GENRES = "GENRES";
+    String ARTISTS = ContentContract.ARTISTS;
+    String GENRES = ContentContract.Artists.GENRES;
     String ARTISTS_GENRES = "ARTISTS_GENRES";
-    String GENRES_JOIN_DELIMITER = "$";
+    String GENRES_JOIN_DELIMITER = ContentContract.GENRES_JOIN_DELIMITER;
 
     interface Artists extends BaseColumns {
         String
-                NAME = "NAME",
-                TRACKS = "TRACKS",
-                ALBUMS = "ALBUMS",
-                LINK = "LINK",
-                DESCRIPTION = "DESCRIPTION",
-                SMALL_COVER = "SMALL_COVER",
-                BIG_COVER = "BIG_COVER";
+                NAME = ContentContract.Artists.NAME,
+                TRACKS = ContentContract.Artists.TRACKS,
+                ALBUMS = ContentContract.Artists.ALBUMS,
+                LINK = ContentContract.Artists.LINK,
+                DESCRIPTION = ContentContract.Artists.DESCRIPTION,
+                SMALL_COVER = ContentContract.Artists.SMALL_COVER,
+                BIG_COVER = ContentContract.Artists.BIG_COVER;
     }
 
     interface Genres extends BaseColumns {
