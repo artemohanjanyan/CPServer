@@ -44,6 +44,12 @@ public class DbOpenHelper extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        setWriteAheadLoggingEnabled(true);
+    }
+
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + ARTISTS);
         db.execSQL("DROP TABLE IF EXISTS " + GENRES);

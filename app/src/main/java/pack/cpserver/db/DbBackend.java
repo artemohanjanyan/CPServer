@@ -37,7 +37,7 @@ public class DbBackend implements Closeable {
     @CheckResult
     public boolean insertArtists(Stream<Artist> artists) {
         SQLiteDatabase database = openHelper.getWritableDatabase();
-        database.beginTransaction();
+        database.beginTransactionNonExclusive();
 
         boolean success = artists.every(artist -> insertArtist(database, artist));
 
