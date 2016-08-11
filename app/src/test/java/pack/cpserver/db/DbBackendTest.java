@@ -37,7 +37,6 @@ public class DbBackendTest {
     public void setUp() throws Exception {
         SQLiteOpenHelper openHelper = new DbOpenHelper(RuntimeEnvironment.application);
         database = openHelper.getWritableDatabase();
-        openHelper.onUpgrade(database, 0, 0);
         backend = new DbBackend(openHelper);
     }
 

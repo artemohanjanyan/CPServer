@@ -36,11 +36,13 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE " + GENRES + " (" +
                 Genres._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                Genres.NAME + " TEXT UNIQUE)");
+                Genres.NAME + " TEXT UNIQUE NOT NULL)");
 
         db.execSQL("CREATE TABLE " + ARTISTS_GENRES + " (" +
                 ArtistsGenres.ARTISTS_ID + " INTEGER," +
-                ArtistsGenres.GENRES_ID + " INTEGER)");
+                ArtistsGenres.GENRES_ID + " INTEGER, " +
+                "PRIMARY KEY " +
+                "(" + ArtistsGenres.ARTISTS_ID + ", " + ArtistsGenres.GENRES_ID + "))");
     }
 
     @Override
