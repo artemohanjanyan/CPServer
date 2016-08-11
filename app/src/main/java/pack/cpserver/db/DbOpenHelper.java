@@ -28,7 +28,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE " + ARTISTS + " (" +
                 Artists._ID + " INTEGER PRIMARY KEY," +
-                Artists.NAME + " TEXT," +
+                Artists.NAME + " TEXT NOT NULL," +
                 Artists.TRACKS + " INTEGER," +
                 Artists.ALBUMS + " INTEGER," +
                 Artists.LINK + " TEXT," +
@@ -41,8 +41,8 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                 Genres.NAME + " TEXT UNIQUE NOT NULL)");
 
         db.execSQL("CREATE TABLE " + ARTISTS_GENRES + " (" +
-                ArtistsGenres.ARTISTS_ID + " INTEGER," +
-                ArtistsGenres.GENRES_ID + " INTEGER, " +
+                ArtistsGenres.ARTISTS_ID + " INTEGER NOT NULL," +
+                ArtistsGenres.GENRES_ID + " INTEGER NOT NULL, " +
                 "PRIMARY KEY " +
                 "(" + ArtistsGenres.ARTISTS_ID + ", " + ArtistsGenres.GENRES_ID + "))");
 

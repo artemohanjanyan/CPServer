@@ -3,6 +3,7 @@ package pack.cpserver.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
@@ -73,17 +74,23 @@ public class DbBackend implements Closeable {
         values.put(Artists.ALBUMS, artist.albums());
         values.put(Artists.LINK, artist.link());
         values.put(Artists.DESCRIPTION, artist.description());
-        values.put(Artists.SMALL_COVER, artist.cover().small());
-        values.put(Artists.BIG_COVER, artist.cover().big());
+        if (artist.cover() != null) {
+            values.put(Artists.SMALL_COVER, artist.cover().small());
+            values.put(Artists.BIG_COVER, artist.cover().big());
+        }
         return database.insert(ARTISTS, null, values) != -1;
     }
 
     @CheckResult
     boolean insertGenre(SQLiteDatabase database, String genre) {
-        ContentValues values = new ContentValues();
-        values.put(Genres.NAME, genre);
-        return database.insertWithOnConflict(GENRES, null, values,
-                SQLiteDatabase.CONFLICT_IGNORE) != -1;
+        try {
+            ContentValues values = new ContentValues();
+            values.put(Genres.NAME, genre);
+            return database.insertWithOnConflict(GENRES, null, values,
+                    SQLiteDatabase.CONFLICT_REPLACE) != -1;
+        } catch (SQLiteException e) {
+            return false;
+        }
     }
 
     @NonNull
@@ -102,14 +109,16 @@ public class DbBackend implements Closeable {
     @CheckResult
     boolean insertArtistGenres(SQLiteDatabase database,
                                Artist artist, SolidMap<String, Integer> genreIds) {
-        boolean success = true;
-        ContentValues values = new ContentValues();
-        values.put(DbContract.ArtistsGenres.ARTISTS_ID, artist.id());
-        for (String genre : artist.genres()) {
-            values.put(DbContract.ArtistsGenres.GENRES_ID, genreIds.get(genre));
-            success &= database.insert(DbContract.ARTISTS_GENRES, null, values) != -1;
-        }
-        return success;
+        return Stream.stream(artist.genres())
+                .every(genre ->
+                        insertArtistGenre(database, artist.id(), genreIds.get(genre)));
+    }
+
+    boolean insertArtistGenre(SQLiteDatabase database, Integer artistId, Integer genreId) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DbContract.ArtistsGenres.ARTISTS_ID, artistId);
+        contentValues.put(DbContract.ArtistsGenres.GENRES_ID, genreId);
+        return database.insert(DbContract.ARTISTS_GENRES, null, contentValues) != -1;
     }
 
     @Override

@@ -57,15 +57,19 @@ public abstract class Artist implements Parcelable {
     @ParcelAdapter(GenresTypeAdapter.class)
     public abstract Set<String> genres();
 
-    public abstract int tracks();
+    @Nullable
+    public abstract Integer tracks();
 
-    public abstract int albums();
+    @Nullable
+    public abstract Integer albums();
 
     @Nullable
     public abstract String link();
 
+    @Nullable
     public abstract String description();
 
+    @Nullable
     public abstract Cover cover();
 
     @AutoValue.Builder
@@ -76,9 +80,9 @@ public abstract class Artist implements Parcelable {
 
         public abstract Builder genres(Set<String> genres);
 
-        public abstract Builder tracks(int tracks);
+        public abstract Builder tracks(Integer tracks);
 
-        public abstract Builder albums(int albums);
+        public abstract Builder albums(Integer albums);
 
         public abstract Builder link(String link);
 
@@ -99,8 +103,10 @@ public abstract class Artist implements Parcelable {
             return new $$AutoValue_Artist_Cover.Builder();
         }
 
+        @Nullable
         public abstract String small();
 
+        @Nullable
         public abstract String big();
 
         @AutoValue.Builder
