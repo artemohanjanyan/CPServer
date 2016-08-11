@@ -14,6 +14,7 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -22,7 +23,9 @@ import pack.cpserver.BuildConfig;
 import solid.collectors.ToSolidList;
 import solid.stream.Stream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
@@ -36,7 +39,6 @@ public class DbBackendTest {
     public void setUp() throws Exception {
         SQLiteOpenHelper openHelper = new DbOpenHelper(RuntimeEnvironment.application);
         database = openHelper.getWritableDatabase();
-        openHelper.onUpgrade(database, 0, 0);
         backend = new DbBackend(openHelper);
     }
 
@@ -48,12 +50,12 @@ public class DbBackendTest {
     @Test
     public void insertAndGetSingleArtist() throws Exception {
         Artist artist = artistTestBuilder(0).build();
-        assertTrue(backend.insertArtist(database, artist) != -1);
+        assertTrue(backend.insertArtist(database, artist));
         Stream.stream(artist.genres()).forEach(genre ->
-                assertTrue(backend.insertGenre(database, genre) != -1));
-        backend.insertArtistGenres(database, artist, backend.getGenreIds(database));
+                assertTrue(backend.insertGenre(database, genre)));
+        assertTrue(backend.insertArtistGenres(database, artist, backend.getGenreIds(database)));
 
-        Cursor artistCursor = backend.getArtists();
+        Cursor artistCursor = backend.getArtists(null, null, null, null, null);
         assertEquals(artistCursor.getCount(), 1);
         assertTrue(artistCursor.moveToNext());
         Artist artist1 = Artist.create(artistCursor);
@@ -70,9 +72,9 @@ public class DbBackendTest {
             artists.add(builder.build());
         }
 
-        backend.insertArtists(Stream.stream(artists));
+        assertTrue(backend.insertArtists(Stream.stream(artists)));
 
-        Cursor artistsCursor = backend.getArtists();
+        Cursor artistsCursor = backend.getArtists(null, null, null, null, null);
         List<Artist> artists1 = new ArrayList<>(artistsCursor.getCount());
         while (artistsCursor.moveToNext()) {
             artists1.add(Artist.create(artistsCursor));
@@ -86,6 +88,27 @@ public class DbBackendTest {
                 .sort((a1, a2) -> Integer.compare(a1.id(), a2.id()))
                 .collect(ToSolidList.toSolidList());
         assertEquals(sorted, sorted1);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void insertArtistWithNullNameThrows() {
+        Artist.Builder builder = Artist.builder();
+        builder.id(0);
+        builder.name(null);
+        builder.genres(Collections.emptySet());
+        assertFalse(backend.insertArtist(database, builder.build()));
+    }
+
+    @Test
+    public void insertGenreWithNullNameReturnsFalse() {
+        assertFalse(backend.insertGenre(database, null));
+    }
+
+    @Test
+    public void insertArtistGenreNullReturnsFalse() {
+        assertFalse(backend.insertArtistGenre(database, null, 1));
+        assertFalse(backend.insertArtistGenre(database, 1, null));
+        assertFalse(backend.insertArtistGenre(database, null, null));
     }
 
     @NonNull
