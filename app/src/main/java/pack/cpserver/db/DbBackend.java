@@ -38,20 +38,23 @@ public class DbBackend implements Closeable {
         SQLiteDatabase database = openHelper.getWritableDatabase();
         database.beginTransactionNonExclusive();
 
-        boolean success = artists.every(artist -> insertArtist(database, artist));
+        try {
+            boolean success = artists.every(artist -> insertArtist(database, artist));
 
-        success &= artists.flatMap(Artist::genres)
-                .collect(ToSolidSet.toSolidSet())
-                .every(genre -> insertGenre(database, genre));
-        SolidMap<String, Integer> genreIds = getGenreIds(database);
+            success &= artists.flatMap(Artist::genres)
+                    .collect(ToSolidSet.toSolidSet())
+                    .every(genre -> insertGenre(database, genre));
+            SolidMap<String, Integer> genreIds = getGenreIds(database);
 
-        success &= artists.every(artist -> insertArtistGenres(database, artist, genreIds));
+            success &= artists.every(artist -> insertArtistGenres(database, artist, genreIds));
 
-        if (success) {
-            database.setTransactionSuccessful();
+            if (success) {
+                database.setTransactionSuccessful();
+            }
+            return success;
+        } finally {
+            database.endTransaction();
         }
-        database.endTransaction();
-        return success;
     }
 
     @NonNull
