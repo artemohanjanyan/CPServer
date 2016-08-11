@@ -7,10 +7,12 @@ import android.util.Log;
 
 import static pack.cpserver.db.DbContract.ARTISTS;
 import static pack.cpserver.db.DbContract.ARTISTS_GENRES;
+import static pack.cpserver.db.DbContract.ARTISTS_WITH_GENRES;
 import static pack.cpserver.db.DbContract.Artists;
 import static pack.cpserver.db.DbContract.ArtistsGenres;
 import static pack.cpserver.db.DbContract.DB_NAME;
 import static pack.cpserver.db.DbContract.GENRES;
+import static pack.cpserver.db.DbContract.GENRES_JOIN_DELIMITER;
 import static pack.cpserver.db.DbContract.Genres;
 
 public class DbOpenHelper extends SQLiteOpenHelper {
@@ -43,6 +45,27 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                 ArtistsGenres.GENRES_ID + " INTEGER, " +
                 "PRIMARY KEY " +
                 "(" + ArtistsGenres.ARTISTS_ID + ", " + ArtistsGenres.GENRES_ID + "))");
+
+        String select = String.format(
+                "select %s, %s, group_concat(%s, '%s') as %s, %s, %s, %s, %s, %s, %s ",
+                ARTISTS + "." + Artists._ID,
+                ARTISTS + "." + Artists.NAME,
+                GENRES + "." + Genres.NAME, GENRES_JOIN_DELIMITER, GENRES,
+                Artists.TRACKS,
+                Artists.ALBUMS,
+                Artists.LINK,
+                Artists.DESCRIPTION,
+                Artists.SMALL_COVER,
+                Artists.BIG_COVER);
+
+        String from =
+                String.format("from %s left join %s on %s = %s left join %s on %s = %s group by %s",
+                        ARTISTS,
+                        ARTISTS_GENRES, ARTISTS + "." + Artists._ID, ArtistsGenres.ARTISTS_ID,
+                        GENRES, GENRES + "." + Genres._ID, ArtistsGenres.GENRES_ID,
+                        ARTISTS + "." + Artists._ID);
+
+        db.execSQL("CREATE VIEW " + ARTISTS_WITH_GENRES + " AS " + select + from);
     }
 
     @Override
@@ -56,6 +79,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + ARTISTS);
         db.execSQL("DROP TABLE IF EXISTS " + GENRES);
         db.execSQL("DROP TABLE IF EXISTS " + ARTISTS_GENRES);
+        db.execSQL("DROP VIEW IF EXISTS " + ARTISTS_WITH_GENRES);
         onCreate(db);
     }
 }

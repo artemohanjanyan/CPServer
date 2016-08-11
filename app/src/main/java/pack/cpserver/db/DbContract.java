@@ -11,6 +11,7 @@ public interface DbContract {
     String GENRES = ContentContract.Artists.GENRES;
     String ARTISTS_GENRES = "ARTISTS_GENRES";
     String GENRES_JOIN_DELIMITER = ContentContract.GENRES_JOIN_DELIMITER;
+    String ARTISTS_WITH_GENRES = "ARTISTS_WITH_GENRES";
 
     interface Artists extends BaseColumns {
         String

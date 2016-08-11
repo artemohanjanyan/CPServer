@@ -20,11 +20,9 @@ import solid.collectors.ToSolidSet;
 import solid.stream.Stream;
 
 import static pack.cpserver.db.DbContract.ARTISTS;
-import static pack.cpserver.db.DbContract.ARTISTS_GENRES;
+import static pack.cpserver.db.DbContract.ARTISTS_WITH_GENRES;
 import static pack.cpserver.db.DbContract.Artists;
-import static pack.cpserver.db.DbContract.ArtistsGenres;
 import static pack.cpserver.db.DbContract.GENRES;
-import static pack.cpserver.db.DbContract.GENRES_JOIN_DELIMITER;
 import static pack.cpserver.db.DbContract.Genres;
 
 public class DbBackend implements Closeable {
@@ -62,27 +60,8 @@ public class DbBackend implements Closeable {
                              String having,
                              String sortOrder) {
         SQLiteDatabase database = openHelper.getReadableDatabase();
-        String select = String.format(
-                "(select %s, %s, group_concat(%s, '%s') as %s, %s, %s, %s, %s, %s, %s ",
-                ARTISTS + "." + Artists._ID,
-                ARTISTS + "." + Artists.NAME,
-                GENRES + "." + Genres.NAME, GENRES_JOIN_DELIMITER, GENRES,
-                Artists.TRACKS,
-                Artists.ALBUMS,
-                Artists.LINK,
-                Artists.DESCRIPTION,
-                Artists.SMALL_COVER,
-                Artists.BIG_COVER);
-
-        String from =
-                String.format("from %s left join %s on %s = %s left join %s on %s = %s group by %s)",
-                        ARTISTS,
-                        ARTISTS_GENRES, ARTISTS + "." + Artists._ID, ArtistsGenres.ARTISTS_ID,
-                        GENRES, GENRES + "." + Genres._ID, ArtistsGenres.GENRES_ID,
-                        ARTISTS + "." + Artists._ID);
-
-        return database.query(
-                select + from, projection, selection, selectionArgs, null, having, sortOrder);
+        return database.query(ARTISTS_WITH_GENRES,
+                projection, selection, selectionArgs, null, having, sortOrder);
     }
 
     @CheckResult
